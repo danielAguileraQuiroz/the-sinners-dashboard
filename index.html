@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<!-- META ETIQUETA CLAVE PARA ADAPTABILIDAD EN MÓVILES -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sinners Studio — Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">
+<style>
+  :root{
+    --bg:#0b0d16;
+    --panel:#12141f;
+    --panel-2:#161826;
+    --line:#232538;
+    --cyan:#3fd7f0;
+    --cyan-dim:rgba(63,215,240,.12);
+    --magenta:#e84fc9;
+    --magenta-dim:rgba(232,79,201,.12);
+    --text:#eef0fb;
+    --text-dim:#8b8fa8;
+    --text-faint:#5c5f76;
+    --green:#5fe0a0;
+    --amber:#f0b93f;
+    --red:#f0605f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:'Segoe UI',Inter,system-ui,sans-serif;
+    color:var(--text);
+    padding:24px;
+  }
+  .shell{
+    max-width:1180px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:220px 1fr;
+    gap:0;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    background:var(--panel);
+  }
+  /* Sidebar */
+  .sidebar{
+    background:#0d0f19;
+    border-right:1px solid var(--line);
+    padding:24px 18px;
+  }
+  .brand{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    padding-bottom:20px;
+    margin-bottom:20px;
+    border-bottom:1px solid var(--line);
+  }
+  .brand-mark{
+    font-size:34px;
+    font-weight:700;
+    color:var(--text);
+    line-height:1;
+    font-family:Georgia,'Times New Roman',serif;
+  }
+  .brand-name{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:18px;
+    margin-top:6px;
+    letter-spacing:.5px;
+  }
+  .brand-sub{
+    font-size:9px;
+    letter-spacing:3px;
+    color:var(--text-faint);
+    margin-top:2px;
+  }
+  .nav{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;}
+  .nav li{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;border-radius:8px;
+    font-size:13px;color:var(--text-dim);
+    cursor:default;
+  }
+  .nav li i{font-size:16px;}
+  .nav li.active{
+    background:var(--cyan-dim);
+    color:var(--cyan);
+    border:1px solid rgba(63,215,240,.35);
+  }
+
+  /* Main */
+  .main{padding:24px 28px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+  .topbar h1{font-size:24px;font-weight:600;margin:0;}
+  .search{
+    display:flex;align-items:center;gap:8px;
+    background:var(--panel-2);border:1px solid var(--line);
+    border-radius:20px;padding:8px 16px;color:var(--text-faint);font-size:13px;width:220px;
+  }
+  .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,#3a3d55,#22243a);
+    margin-left:14px;display:flex;align-items:center;justify-content:center;color:var(--text-dim);
+  }
+  .topbar-right{display:flex;align-items:center;}
+
+  .grid{display:grid;gap:16px;}
+  .row-3{grid-template-columns:1.2fr 1fr 1fr;}
+  .row-2{grid-template-columns:1.6fr 1fr;margin-top:16px;}
+  .row-3b{grid-template-columns:1fr 1fr 1fr;margin-top:16px;}
+
+  .card{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px;
+  }
+  .card-label{
+    font-size:11px;letter-spacing:1px;color:var(--text-faint);
+    text-transform:uppercase;margin-bottom:10px;
+  }
+
+  /* Saldo neto */
+  .balance-card{display:flex;justify-content:space-between;align-items:flex-start;}
+  .ring-wrap{position:relative;width:110px;height:110px;flex:none;}
+  .ring-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+  }
+  .ring-value{font-size:17px;font-weight:600;color:var(--cyan);}
+  .ring-sub{display:flex;gap:10px;font-size:9px;color:var(--text-faint);margin-top:4px;}
+  .balance-side{text-align:right;font-size:11px;color:var(--text-dim);line-height:1.9;}
+  .balance-side b{color:var(--text);font-size:14px;display:block;}
+
+  /* Ingresos / Gastos mini charts */
+  .stat-value{font-size:26px;font-weight:600;margin:4px 0 10px;}
+  .mini-chart{height:50px;}
+  .pill{
+    display:inline-block;margin-top:10px;padding:4px 10px;border-radius:20px;
+    font-size:10px;letter-spacing:.5px;font-weight:600;
+  }
+  .pill-magenta{background:var(--magenta-dim);color:var(--magenta);}
+
+  /* Panel gestión facturas */
+  .action-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px;}
+  .action-box{
+    border:1px solid;border-radius:12px;padding:26px 10px;text-align:center;
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+  }
+  .action-box i{font-size:26px;}
+  .action-box span{font-size:13px;font-weight:600;letter-spacing:.3px;}
+  .action-cyan{border-color:rgba(63,215,240,.4);background:var(--cyan-dim);color:var(--cyan);}
+  .action-magenta{border-color:rgba(232,79,201,.4);background:var(--magenta-dim);color:var(--magenta);}
+
+  /* Solicitudes */
+  .req-item{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 0;border-bottom:1px solid var(--line);
+  }
+  .req-item:last-child{border-bottom:none;}
+  .req-icon{
+    width:32px;height:32px;border-radius:8px;flex:none;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--panel);color:var(--amber);font-size:15px;
+  }
+  .req-text{flex:1;min-width:0;}
+  .req-title{font-size:12.5px;font-weight:500;}
+  .req-date{font-size:10.5px;color:var(--text-faint);}
+  .req-amount{font-size:12.5px;font-weight:600;color:var(--red);white-space:nowrap;}
+
+  /* Tabla facturas */
+  .table-responsive { width: 100%; overflow-x: auto; }
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
+  th{
+    text-align:left;font-size:10.5px;letter-spacing:.5px;color:var(--text-faint);
+    text-transform:uppercase;padding-bottom:8px;font-weight:500;
+    border-bottom:1px solid var(--line);
+  }
+  td{padding:9px 0;border-bottom:1px solid var(--line);color:var(--text-dim);}
+  td.name{color:var(--text);display:flex;align-items:center;gap:8px;}
+  td.name i{color:var(--text-faint);font-size:14px;}
+  .status-enviado{color:var(--green);font-weight:600;}
+  .status-pendiente{color:var(--amber);font-weight:600;}
+  .table-total{display:flex;justify-content:space-between;margin-top:10px;font-size:13px;font-weight:600;}
+  .table-total span:last-child{color:var(--green);}
+  .legend{display:flex;gap:16px;font-size:11px;color:var(--text-faint);}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:7px;height:7px;border-radius:50%;}
+  .head-row{display:flex;justify-content:space-between;align-items:center;}
+
+  /* Estado envios */
+  .env-total{font-size:20px;font-weight:600;margin:4px 0 14px;}
+  .env-list{display:flex;flex-direction:column;gap:14px;}
+  .env-item{display:flex;gap:10px;}
+  .env-check{
+    width:22px;height:22px;border-radius:50%;flex:none;
+    background:var(--cyan-dim);color:var(--cyan);
+    display:flex;align-items:center;justify-content:center;font-size:12px;
+  }
+  .env-name{font-size:12.5px;font-weight:500;}
+  .env-name em{font-style:normal;color:var(--text-faint);font-size:10.5px;}
+  .env-date{font-size:11px;color:var(--green);}
+  .env-footer{
+    margin-top:16px;padding-top:12px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--text-dim);
+  }
+
+  /* Bottom row */
+  .bars{display:flex;align-items:flex-end;gap:5px;height:60px;margin:10px 0;}
+  .bar{flex:1;background:linear-gradient(180deg,var(--cyan),var(--magenta));border-radius:3px 3px 0 0;}
+  .progress-track{
+    height:6px;background:var(--panel);border-radius:4px;overflow:hidden;margin-top:8px;
+  }
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--magenta));}
+  .row-between{display:flex;justify-content:space-between;align-items:baseline;}
+  .donut-row{display:flex;align-items:center;gap:16px;}
+  .donut-legend{font-size:10.5px;color:var(--text-dim);line-height:1.8;}
+  .donut-legend b{color:var(--text);}
+  .footer-btns{display:flex;gap:8px;margin-top:14px;}
+  .footer-btns button{
+    flex:1;background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
+    border-radius:8px;padding:8px;font-size:11px;display:flex;align-items:center;
+    justify-content:center;gap:6px;
+  }
+
+  /* --- REGLAS DE ADAPTABILIDAD RESPONSIVE (MÓVILES Y TABLETS) --- */
+  @media (max-width: 850px) {
+    body { padding: 8px; }
+    
+    .shell {
+      grid-template-columns: 1fr; /* Sidebar pasa a la parte superior */
+    }
+    
+    .sidebar {
+      border-right: none;
+      border-bottom: 1px solid var(--line);
+      padding: 16px;
+    }
+    
+    .brand {
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .nav {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+    
+    .nav li {
+      font-size: 12px;
+      padding: 6px 10px;
+    }
+
+    .main { padding: 16px 12px; }
+
+    /* Forzar todas las cuadrículas a 1 sola columna */
+    .row-3, .row-2, .row-3b {
+      grid-template-columns: 1fr !important;
+      margin-top: 12px;
+    }
+
+    .card {
+      grid-column: span 1 !important;
+    }
+
+    .topbar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .topbar-right {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .search { width: 100%; }
+
+    .action-grid {
+      grid-template-columns: 1fr; /* Botones de carga en vertical */
+    }
+
+    .balance-card {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .balance-side { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div class="brand-name">The Sinners</div>
+      <div class="brand-sub">S T U D I O</div>
+    </div>
+    <ul class="nav">
+      <li><i class="ti ti-home"></i>Panel principal</li>
+      <li class="active"><i class="ti ti-file-invoice"></i>Gastos activo</li>
+      <li><i class="ti ti-cash"></i>Ingresos</li>
+      <li><i class="ti ti-report"></i>Resumen</li>
+      <li><i class="ti ti-settings"></i>Configuración</li>
+    </ul>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-right">
+        <div class="search"><i class="ti ti-search"></i>Buscar</div>
+        <div class="avatar"><i class="ti ti-user"></i></div>
+      </div>
+    </div>
+
+    <!-- Row 1: saldo / ingresos / gastos -->
+    <div class="grid row-3">
+      <div class="card balance-card">
+        <div>
+          <div class="card-label">Saldo neto mensual</div>
+          <div class="ring-wrap">
+            <svg width="110" height="110" viewBox="0 0 110 110">
+              <circle cx="55" cy="55" r="46" fill="none" stroke="#232538" stroke-width="10"/>
+              <circle cx="55" cy="55" r="46" fill="none" stroke="#3fd7f0" stroke-width="10"
+                stroke-dasharray="289" stroke-dashoffset="75" stroke-linecap="round"
+                transform="rotate(-90 55 55)"/>
+            </svg>
+            <div class="ring-center">
+              <div class="ring-value">+2.850€</div>
+              <div class="ring-sub"><span>▲ hoy</span><span>▲ mensual</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="balance-side">
+          Total<b>14.830 €</b>
+          Ratio<b style="color:var(--cyan);font-size:12px;">17,29%</b>
+          Gastos<b style="color:var(--magenta);font-size:12px;">20%</b>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Ingresos (mes)</div>
+        <div class="stat-value">1.387€</div>
+        <svg class="mini-chart" width="100%" height="50" viewBox="0 0 200 50" preserveAspectRatio="none">
+          <polyline points="0,35 25,30 50,38 75,20 100,28 125,15 150,22 175,10 200,18"
+            fill="none" stroke="#3fd7f0" stroke-width="2.5"/>
+        </svg>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Gastos (mes)</div>
+        <div class="stat-value">2.387€</div>
+        <svg class="mini-chart" width="100%" height="50" viewBox="0 0 200 50" preserveAspectRatio="none">
+          <polyline points="0,30 25,18 50,25 75,12 100,20 125,8 150,16 175,22 200,10"
+            fill="none" stroke="#e84fc9" stroke-width="2.5"/>
+        </svg>
+        <span class="pill pill-magenta">Facturas pendientes</span>
+      </div>
+    </div>
+
+    <!-- Row 2: gestión facturas / solicitudes -->
+    <div class="grid row-2">
+      <div class="card">
+        <div class="card-label">Panel de gestión de facturas activa</div>
+        <div class="action-grid">
+          <div class="action-box action-cyan"><i class="ti ti-clipboard-text"></i><span>Carga manual</span></div>
+          <div class="action-box action-magenta"><i class="ti ti-camera"></i><span>Auto-relleno con foto</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Solicitudes de pago especial</div>
+        <div class="req-item">
+          <div class="req-icon"><i class="ti ti-file-text"></i></div>
+          <div class="req-text">
+            <div class="req-title">Pago licencia software</div>
+            <div class="req-date">Transacción online · 19 sep 2022</div>
+          </div>
+          <div class="req-amount">-12.257€</div>
+        </div>
+        <div class="req-item">
+          <div class="req-icon"><i class="ti ti-file-invoice"></i></div>
+          <div class="req-text">
+            <div class="req-title">Pago licencia software</div>
+            <div class="req-date">Transferencia bancaria · 16 sep 2022</div>
+          </div>
+          <div class="req-amount">-103,93€</div>
+        </div>
+        <div class="req-item">
+          <div class="req-icon"><i class="ti ti-receipt"></i></div>
+          <div class="req-text">
+            <div class="req-title">Pago licencia software</div>
+            <div class="req-date">Transferencia bancaria · 21 sep 2022</div>
+          </div>
+          <div class="req-amount">-197,58€</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: tabla facturas / estado envios -->
+    <div class="grid row-2">
+      <div class="card">
+        <div class="head-row">
+          <div class="card-label" style="margin-bottom:0;">Facturas recientes y envíos al gestor</div>
+          <div class="legend">
+            <span><span class="dot" style="background:#3fd7f0;"></span>Ingresos</span>
+            <span><span class="dot" style="background:#e84fc9;"></span>Gastos</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>Proveedor</th><th>Importe</th><th>Fecha</th><th>Estado envío</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="name"><i class="ti ti-user"></i>Proveedor A</td>
+                <td>250,00€</td><td>10 oct</td><td class="status-enviado">Enviado</td>
+              </tr>
+              <tr>
+                <td class="name"><i class="ti ti-truck"></i>Suministro B</td>
+                <td>85,50€</td><td>09 oct</td><td class="status-pendiente">Pendiente</td>
+              </tr>
+              <tr>
+                <td class="name"><i class="ti ti-scissors"></i>Servicio C</td>
+                <td>150,00€</td><td>08 oct</td><td class="status-enviado">Enviado</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-total"><span>Total procesado (mes)</span><span>+7.175,50€</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Estado de envíos al gestor</div>
+        <div style="font-size:11px;color:var(--text-faint);">Total transmitido (mes)</div>
+        <div class="env-total">87 facturas</div>
+        <div class="env-list">
+          <div class="env-item">
+            <div class="env-check"><i class="ti ti-check"></i></div>
+            <div>
+              <div class="env-name">Transmisión septiembre <em>(lote 01)</em></div>
+              <div class="env-date">Enviado 30 sep</div>
+            </div>
+          </div>
+          <div class="env-item">
+            <div class="env-check"><i class="ti ti-check"></i></div>
+            <div>
+              <div class="env-name">Transmisión agosto <em>(lote 01)</em></div>
+              <div class="env-date">Enviado 31 ago</div>
+            </div>
+          </div>
+          <div class="env-item">
+            <div class="env-check"><i class="ti ti-check"></i></div>
+            <div>
+              <div class="env-name">Transmisión julio <em>(lote 01)</em></div>
+              <div class="env-date">Enviado 31 jul</div>
+            </div>
+          </div>
+        </div>
+        <div class="env-footer">Facturas pendientes en cola: 3</div>
+      </div>
+    </div>
+
+    <!-- Row 4: saldo neto bars / ingresos totales donut -->
+    <div class="grid row-3b">
+      <div class="card">
+        <div class="card-label">Saldo neto mensual</div>
+        <div class="row-between">
+          <div>
+            <div style="font-size:11px;color:var(--text-faint);">Facturas subidas</div>
+            <div style="font-size:20px;font-weight:600;">+2.850€</div>
+          </div>
+          <div style="font-size:11px;color:var(--text-faint);">75%</div>
+        </div>
+        <div class="bars">
+          <div class="bar" style="height:35%;"></div>
+          <div class="bar" style="height:55%;"></div>
+          <div class="bar" style="height:40%;"></div>
+          <div class="bar" style="height:70%;"></div>
+          <div class="bar" style="height:50%;"></div>
+          <div class="bar" style="height:85%;"></div>
+          <div class="bar" style="height:60%;"></div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:75%;"></div></div>
+        <div style="font-size:10px;color:var(--amber);margin-top:6px;">En proceso</div>
+      </div>
+
+      <div class="card" style="grid-column:span 2;">
+        <div class="card-label">Ingresos totales (mes)</div>
+        <div class="donut-row">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="36" fill="none" stroke="#232538" stroke-width="9"/>
+            <circle cx="45" cy="45" r="36" fill="none" stroke="#3fd7f0" stroke-width="9"
+              stroke-dasharray="226" stroke-dashoffset="140" stroke-linecap="round"
+              transform="rotate(-90 45 45)"/>
+            <text x="45" y="50" text-anchor="middle" font-size="18" font-weight="600" fill="#eef0fb">38%</text>
+          </svg>
+          <div class="donut-legend">
+            Total<b> · conciliación automática +19%</b><br>
+            Automática<b> · todavía +25%</b>
+          </div>
+        </div>
+        <div class="footer-btns">
+          <button><i class="ti ti-adjustments"></i>Simplificar</button>
+          <button><i class="ti ti-settings"></i>Configurar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
